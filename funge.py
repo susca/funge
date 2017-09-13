@@ -4,8 +4,6 @@
 #
 # usage: funge.py <prog.fu>
 
-dim = (80,80)
-
 import sys
 import logging
 logging.addLevelName( logging.WARNING, "\033[1;31m%-8s\033[1;0m" % logging.getLevelName(logging.WARNING))
@@ -22,13 +20,14 @@ class Prog:
   def __init__(self, src):
       self.cursor = [0,0]
       self.delta = (1,0)
-
+      self.dim = 80,25
+      
       src_lines = src.split('\n')
-      n_lines = len(src_lines)
-      longest_line = max(map(len,src_lines))
+      [src_lines.append('') for _ in range(len(src_lines),self.dim[1])]
+      self.src = '\n'.join(f'{s:<{self.dim[0]}}' for s in src_lines)
 
-      self.src = '\n'.join(f'{s:<{longest_line}}' for s in src_lines)
-      self.dim = longest_line, n_lines
+      assert all(x == self.dim[0] for x in map(len,self.src.split('\n'))) 
+      assert self.src.count('\n') == self.dim[1]-1
 
       logging.debug(f'The source {self.dim}:\n'+self.src)
 
