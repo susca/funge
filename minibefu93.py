@@ -2,55 +2,56 @@
 # minibefu93.py -- a minimal Befunge93 interpreter written in Python
 # usage: minibefu93.py <prog.fu>
 import sys,random
-cursor=0,0
-delta=1,0
-dim=80,25
-def coords(x,y):return x+dim[0]*y+y
-def get(src,pos=None):
-  x,y=cursor if pos is None else pos
-  return src[coords(x,y)]
-def put(src,pos,val):
-  off=coords(*pos)
-  return src[:off]+chr(val)+src[off+1:]
-def advance():return (cursor[0]+delta[0])%dim[0],(cursor[1]+delta[1])%dim[1]
-class Stack(list):
-  def pop(self,*args):return super().pop(*args) if len(self)>0 else 0
-  def push(self,val):self.append(val)
-  def __getitem__(self,key):return super().__getitem__(key) if len(self)>0 else 0
-with open(sys.argv[1]) as f:src=f.read()
-lines=src.split('\n')
-[lines.append('') for _ in range(len(lines),dim[1])]
-src='\n'.join(f'{s:<{dim[0]}}' for s in lines)
-stack=Stack()
-s_mode=False
+o=sys.stdout
+q=0,0
+d=1,0
+m=80,25
+def k(x,y):return x+m[0]*y+y
+def g(s,p=None):
+  x,y=q if p is None else p
+  return s[k(x,y)]
+def p(s,p,v):
+  o=k(*p)
+  return s[:o]+chr(v)+s[o+1:]
+def a():return (q[0]+d[0])%m[0],(q[1]+d[1])%m[1]
+class S(list):
+  def p(s,*a):return super().pop(*a) if s else 0
+  def a(s,v):s.append(v)
+  def __getitem__(s,key):return super().__getitem__(key) if s else 0
+with open(sys.argv[1]) as f:r=f.read()
+l=r.split('\n')
+[l.append('') for _ in range(len(l),m[1])]
+r='\n'.join(f'{s:<{m[0]}}' for s in l)
+s=S()
+f=False
 while True:
-  cmd=get(src)
-  if cmd=='"':s_mode=not s_mode
-  elif s_mode:stack.push(ord(cmd))
-  elif cmd in '1234567890':stack.push(int(cmd))
-  elif cmd=='>':delta=(1,0)
-  elif cmd=='<':delta=(-1,0)
-  elif cmd=='^':delta=(0,-1)
-  elif cmd=='v':delta=(0,1)
-  elif cmd=='?':delta=random.choice(((0,1),(1,0),(-1,0),(0,-1)))
-  elif cmd=='#':cursor=advance()
-  elif cmd=='+':stack.push(stack.pop()+stack.pop())
-  elif cmd=='-':stack.push(stack.pop(-2)-stack.pop())   
-  elif cmd=='*':stack.push(stack.pop()*stack.pop())
-  elif cmd=='/':stack.push(int(stack.pop(-2) // stack.pop()))
-  elif cmd=='%':stack.push(stack.pop(-2) % stack.pop())
-  elif cmd=='!':stack.push(int(not bool(stack.pop())))
-  elif cmd=='`':stack.push(int(stack.pop(-2)>stack.pop()))
-  elif cmd=='_':delta=(-1,0) if stack.pop() else (1,0)
-  elif cmd=='|':delta=(0,-1) if stack.pop() else (0,1)
-  elif cmd==':':stack.push(stack[-1])
-  elif cmd=='\\':a,b=stack.pop(),stack.pop();stack.push(a);stack.push(b)
-  elif cmd=='$':stack.pop()
-  elif cmd=='.':sys.stdout.write(str(stack.pop()));sys.stdout.flush()
-  elif cmd==',':sys.stdout.write(chr(stack.pop()));sys.stdout.flush()
-  elif cmd=='&':stack.push(int(input()))
-  elif cmd=='~':stack.push(ord(input()[0]))
-  elif cmd=='g':y,x=stack.pop(),stack.pop();stack.push(ord(get(src,(x,y))))
-  elif cmd=='p':y,x,v=stack.pop(),stack.pop(),stack.pop();src=put(src,(x,y),v)
-  elif cmd=='@':break
-  cursor=advance()
+  c=g(r)
+  if c=='"':f=not f
+  elif f:s.a(ord(c))
+  elif c in '1234567890':s.a(int(c))
+  elif c=='>':d=(1,0)
+  elif c=='<':d=(-1,0)
+  elif c=='^':d=(0,-1)
+  elif c=='v':d=(0,1)
+  elif c=='?':d=random.choice(((0,1),(1,0),(-1,0),(0,-1)))
+  elif c=='#':q=a()
+  elif c=='+':s.a(s.p()+s.p())
+  elif c=='-':s.a(s.p(-2)-s.p())
+  elif c=='*':s.a(s.p()*s.p())
+  elif c=='/':s.a(int(s.p(-2) // s.p()))
+  elif c=='%':s.a(s.p(-2) % s.p())
+  elif c=='!':s.a(int(not bool(s.p())))
+  elif c=='`':s.a(int(s.p(-2)>s.p()))
+  elif c=='_':d=(-1,0) if s.p() else (1,0)
+  elif c=='|':d=(0,-1) if s.p() else (0,1)
+  elif c==':':s.a(s[-1])
+  elif c=='\\':i,j=s.p(),s.p();s.a(i);s.a(j)
+  elif c=='$':s.p()
+  elif c=='.':o.write(str(s.p()));o.flush()
+  elif c==',':o.write(chr(s.p()));o.flush()
+  elif c=='&':s.a(int(input()))
+  elif c=='~':s.a(ord(input()[0]))
+  elif c=='g':y,x=s.p(),s.p();s.a(ord(g(r,(x,y))))
+  elif c=='p':y,x,v=s.p(),s.p(),s.p();r=p(r,(x,y),v)
+  elif c=='@':break
+  q=a()
